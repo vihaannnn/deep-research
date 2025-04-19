@@ -33,13 +33,12 @@ def distill_individual_article(article, user_query):
     try:
         # Using GPT-4-turbo as the reasoning model to distill information from each article
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # Using GPT-4-turbo for distillation
+            model="o1-preview",  # Using GPT-4-turbo for distillation
             messages=[
-                {"role": "system", "content": "You are an expert analyst who extracts and distills all key information from content. Be thorough and comprehensive."},
+                {"role": "user", "content": "You are an expert analyst who extracts and distills all key information from content. Be thorough and comprehensive."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=2000,
-            temperature=0.3
+            max_completion_tokens=2000
         )
         return {
             "url": article['url'],
@@ -57,11 +56,22 @@ def generate_report_from_distilled_content(distilled_articles, user_query):
     """
     Generate a comprehensive report from all distilled article content
     """
+    # Add debugging to check if distilled_articles is empty or invalid
+    if not distilled_articles:
+        print("ERROR: distilled_articles is empty!")
+        return "No content available to generate report. Please ensure articles were properly distilled first."
+    
+    print(f"Number of distilled articles: {len(distilled_articles)}")
+    print(f"First article structure: {distilled_articles[0].keys() if distilled_articles else 'None'}")
+    
     # Prepare distilled content for the report generation model
     combined_distilled_content = "\n\n".join([
         f"Source: {item['url']}\nDate: {item['publication_date']}\n{item['distilled_content']}" 
-        for item in distilled_articles
+        for item in distilled_articles if 'url' in item and 'publication_date' in item and 'distilled_content' in item
     ])
+    
+    # Debug the combined content
+    print(f"Combined content length: {len(combined_distilled_content)}")
     
     # Create prompt for report generation
     prompt = f"""
@@ -73,12 +83,13 @@ def generate_report_from_distilled_content(distilled_articles, user_query):
     
     Please structure your report with clear sections, bullet points where appropriate, 
     and highlight key insights. Format your response in markdown.
+    Do not use any information outside the content from the Distilled Content from the Articles.
     """
     
     try:
         # Using GPT-4-turbo for generating the final report
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # Using GPT-4-turbo for the final report generation
+            model="gpt-4.1",  # Using GPT-4-turbo for the final report generation
             messages=[
                 {"role": "system", "content": "You are an expert analyst who creates detailed, well-structured reports based on distilled information."},
                 {"role": "user", "content": prompt}
@@ -256,6 +267,9 @@ def main():
             
             # Check if we have distilled articles
             if hasattr(st.session_state, 'distilled_articles') and st.session_state.distilled_articles:
+                # Add debugging to verify the content
+                st.write(f"Number of distilled articles available: {len(st.session_state.distilled_articles)}")
+                
                 analysis_query = st.text_area("Specify what you want to analyze about these results:", 
                                              value=user_query, height=100)
                 
@@ -265,16 +279,20 @@ def main():
                     with st.spinner("Generating comprehensive report from distilled content..."):
                         report_status.info("Creating comprehensive analysis report... This may take a moment.")
                         
-                        # Generate report using distilled content
-                        report_content = generate_report_from_distilled_content(
-                            st.session_state.distilled_articles, 
-                            analysis_query
-                        )
-                        
-                        # Display the report in Streamlit
-                        report_status.success("Report generated successfully!")
-                        st.subheader("Generated Report")
-                        st.markdown(report_content)
+                        # Check the structure of distilled articles before passing
+                        if not st.session_state.distilled_articles:
+                            report_status.error("No distilled articles found. Please distill the articles first.")
+                        else:
+                            # Generate report using distilled content
+                            report_content = generate_report_from_distilled_content(
+                                st.session_state.distilled_articles, 
+                                analysis_query
+                            )
+                            
+                            # Display the report in Streamlit
+                            report_status.success("Report generated successfully!")
+                            st.subheader("Generated Report")
+                            st.markdown(report_content)
             else:
                 st.warning("Please distill the articles first in the 'Distilled Content' tab.")
 
