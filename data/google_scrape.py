@@ -56,7 +56,7 @@ def enhance_query_with_llm(user_query, recent_news=True):
         print(f"Error in enhancing query: {e}")
         return user_query  # Fallback to original query if enhancement fails
 
-def google_search(query, num_results=1):
+def google_search(query, num_results=5):
     """
     Perform a Google search using the googlesearch-python library
     """
