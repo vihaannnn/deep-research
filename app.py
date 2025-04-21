@@ -261,7 +261,7 @@ def main():
                 
                 if st.button("Generate Report"):
                     with st.spinner("Generating comprehensive report from distilled content..."):
-                        report_status.info("Creating comprehensive analysis report with OpenAI o1 model... This may take a moment.")
+                        report_status.info("Creating comprehensive analysis report with OpenAI gpt4-turbo model... This may take a moment.")
                         
                         # Generate report using distilled content
                         report_content = generate_report_from_distilled_content(

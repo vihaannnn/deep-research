@@ -112,13 +112,13 @@ The application's data pipeline consists of several stages:
    - Content is cleaned and truncated if necessary
 
 4. **Information Distillation**:
-   - GPT-4 processes each article to extract key information
+   - OpenAI's o1 model processes each article to extract key information
    - All relevant facts, quotes, statistics, and insights are preserved
    - Results are formatted as bulleted lists for readability
 
 5. **Report Generation**:
    - Distilled content from all sources is combined
-   - GPT-4 creates a comprehensive, structured report addressing the user's query
+   - GPT-4-turbo creates a comprehensive, structured report addressing the user's query
    - The report is presented in markdown format
 
 ## Model Pipeline
@@ -132,6 +132,8 @@ Deep Research leverages several AI models for different tasks:
 2. **GPT-4-Turbo**:
    - Primary model for content analysis
    - Performs information distillation from raw article content
+
+3. **OpenAI o1**:
    - Generates comprehensive reports from distilled information
 
 The models are configured with appropriate parameters:
@@ -164,3 +166,8 @@ Please review our [Ethics Statement](ETHICS.md) for information on our approach 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Deployed App
+
+You can find the Deep learning version of the deep-research app (with content distillation) deployed [here](https://deep-research-cyydabns6j5atynhqxetsk.streamlit.app/)
+You can find the Naive version of the deep-research app (without content distillation) deployed [here](https://deep-research-naive-develop.streamlit.app/)
