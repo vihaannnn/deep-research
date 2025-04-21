@@ -8,6 +8,10 @@ import base64
 import datetime
 
 # Import the search_and_extract function from google-latest.py
+# Get the parent directory (one level up from the current file)
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+
 from data.google_scrape import search_and_extract
 
 # Initialize OpenAI client

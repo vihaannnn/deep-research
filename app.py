@@ -13,7 +13,7 @@ client = OpenAI()
 
 def distill_individual_article(article, user_query):
     """
-    Process individual article with GPT-4-turbo to extract all relevant information
+    Process individual article with OpenAI o1 model to extract all relevant information
     """
     # Create prompt for reasoning model
     prompt = f"""
@@ -31,15 +31,13 @@ def distill_individual_article(article, user_query):
     """
     
     try:
-        # Using GPT-4-turbo as the reasoning model to distill information from each article
+        # Using o1 model as the reasoning model to distill information from each article
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # Using GPT-4-turbo for distillation
+            model="o1",  # Changed to o1 model for distillation
             messages=[
-                {"role": "system", "content": "You are an expert analyst who extracts and distills all key information from content. Be thorough and comprehensive."},
+                {"role": "user", "content": "You are an expert analyst who extracts and distills all key information from content. Be thorough and comprehensive."},
                 {"role": "user", "content": prompt}
-            ],
-            max_tokens=2000,
-            temperature=0.3
+            ]
         )
         return {
             "url": article['url'],
@@ -76,9 +74,9 @@ def generate_report_from_distilled_content(distilled_articles, user_query):
     """
     
     try:
-        # Using GPT-4-turbo for generating the final report
+        # Using o1 model for generating the final report
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # Using GPT-4-turbo for the final report generation
+            model="gpt-4-turbo",  # Changed to o1 model for report generation
             messages=[
                 {"role": "system", "content": "You are an expert analyst who creates detailed, well-structured reports based on distilled information."},
                 {"role": "user", "content": prompt}
@@ -214,7 +212,7 @@ def main():
                     """)
                     
                     # Show processing status
-                    processing_status.warning("⏳ Extracting key information...")
+                    processing_status.warning("⏳ Extracting key information with OpenAI o1 model...")
                     
                     # Distill the article
                     distilled = distill_individual_article(article, user_query)
@@ -233,7 +231,7 @@ def main():
                     time.sleep(0.1)
                 
                 # Show completion message
-                distillation_status.success(f"Successfully distilled {len(st.session_state.distilled_articles)} articles.")
+                distillation_status.success(f"Successfully distilled {len(st.session_state.distilled_articles)} articles using OpenAI o1 model.")
                 
                 # Reset the flag since distillation is complete
                 st.session_state.distillation_in_progress = False
@@ -263,7 +261,7 @@ def main():
                 
                 if st.button("Generate Report"):
                     with st.spinner("Generating comprehensive report from distilled content..."):
-                        report_status.info("Creating comprehensive analysis report... This may take a moment.")
+                        report_status.info("Creating comprehensive analysis report with OpenAI o1 model... This may take a moment.")
                         
                         # Generate report using distilled content
                         report_content = generate_report_from_distilled_content(
